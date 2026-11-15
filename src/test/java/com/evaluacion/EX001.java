@@ -40,10 +40,13 @@ class EX001 extends BaseTest {
         login(config("user.email"), config("user.password"));
 
         // Validacion: el usuario inicio sesion correctamente
-        assertTrue(isDisplayed(By.cssSelector(".user-info a.logout")),
+        assertTrue(isDisplayed(By.className("logout")),
                 "No se muestra el enlace 'Sign out': el usuario no inicio sesion");
         String accountName = waitVisible(By.cssSelector(".user-info a.account span")).getText();
         assertFalse(accountName.isBlank(), "No se muestra el nombre del usuario autenticado en el encabezado");
+
+        // Precondicion: carrito vacio para que el escenario sea independiente de ejecuciones anteriores
+        emptyCart();
 
         // 3-5. Navegar por el catalogo, seleccionar y agregar productos al carrito
         List<String> addedProducts = addProductsToCart(products);
@@ -69,7 +72,7 @@ class EX001 extends BaseTest {
     private void login(String email, String password) {
         click(By.cssSelector(".user-info a[href*='controller=my-account'], .user-info a[href*='authentication']"));
         type(By.id("field-email"), email);
-        type(By.id("field-password"), password);
+        type(By.name("password"), password);
         click(By.id("submit-login"));
         waitVisible(By.cssSelector(".user-info a.logout"));
     }

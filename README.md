@@ -34,3 +34,10 @@ mvn test -Dtest=EX002         # solo compra como invitado
 mvn test -Dheadless=true      # sin abrir la ventana del navegador
 mvn test -Duser.email=otro@correo.com -Duser.password=Secreto1   # otro usuario registrado
 ```
+
+## Incidencia observada en la aplicación
+
+La tienda es pública y compartida. Durante las ejecuciones, el carrito llegó a mostrar productos que la prueba
+no agregó, o a vaciarse entre pasos (estado compartido del lado del servidor por usuarios concurrentes).
+Las aserciones del carrito detectan esta situación y la prueba falla con un mensaje descriptivo.
+Para reducir el impacto, EX001 vacía el carrito del usuario registrado antes de agregar productos.

@@ -182,9 +182,36 @@ public abstract class BaseTest {
         return addedNames;
     }
 
+    /**
+     * Accede al carrito. Si el icono del encabezado tiene enlace (carrito con productos) se usa;
+     * de lo contrario se navega directo a la pagina del carrito para que la Assertion reporte el problema.
+     */
     protected void openCart() {
-        click(By.cssSelector("#_desktop_cart .blockcart a"));
-        waitVisible(By.cssSelector(".cart-overview .cart-items"));
+        By headerCartLink = By.cssSelector("#_desktop_cart .blockcart a");
+        if (isDisplayed(headerCartLink)) {
+            click(headerCartLink);
+        } else {
+            driver.get(config("base.url") + "?controller=cart&action=show");
+        }
+        waitVisible(By.cssSelector(".cart-grid"));
+    }
+
+    /**
+     * Elimina los productos que hayan quedado en el carrito de ejecuciones anteriores
+     * (el carrito de un usuario registrado se conserva en el servidor entre sesiones).
+     */
+    protected void emptyCart() {
+        driver.get(config("base.url") + "?controller=cart&action=show");
+        waitVisible(By.cssSelector(".cart-grid"));
+        By removeButtons = By.cssSelector(".cart-item a.remove-from-cart");
+        List<WebElement> items = driver.findElements(removeButtons);
+        while (!items.isEmpty()) {
+            WebElement firstItem = items.get(0);
+            click(removeButtons);
+            wait.until(ExpectedConditions.stalenessOf(firstItem));
+            items = driver.findElements(removeButtons);
+        }
+        openHomePage();
     }
 
     protected List<String> getCartProductNames() {
@@ -207,7 +234,7 @@ public abstract class BaseTest {
     }
 
     protected void proceedToCheckout() {
-        click(By.cssSelector(".cart-detailed-actions a.btn-primary"));
+        click(By.xpath("//div[contains(@class,'cart-detailed-actions')]//a[contains(@class,'btn-primary')]"));
         waitVisible(By.id("checkout-personal-information-step"));
     }
 
